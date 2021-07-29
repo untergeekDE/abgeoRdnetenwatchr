@@ -38,6 +38,8 @@ Jeder Typ Entität hat seine eigenen Datenpunkte (also: Spalten in der Rückgabe
 
 ## Beispiel-Aufrufe
 
+Die API gibt standardmäßig 100 Ergebnisse zurück, wenn man mehr braucht, muss man mit ```range_end``` (max. 1000) mehr Ergebnisse anfordern oder mit ```range_start``` bzw. ```page``` paginieren.
+
 ### Wahlen (BTW2021 hat die ID 128)
 * [/parliament-periods?type=election&parliament=5](https://www.abgeordnetenwatch.de/api/v2/parliament-periods?type=election&parliament=5)
 
@@ -72,16 +74,15 @@ indirekt, über referenziertes Objekt politician und Daten da
 (Filter über das related_data-Element party)
 * [/politicians?party[entity.id]=1](https://www.abgeordnetenwatch.de/api/v2/politicians?party[entity.id]=1)
 
+## Hilfsfunktion
+
+Um die Abrufe etwas zu formalisieren, habe ich mir die Funktion ```aw_get_table(entity,...)``` gebastelt. 
+- entity ist eine der oben erwähnten Entitäten - wonach fragen wir die Datenbank ab?
+- ... ist eine Liste von Filtern und Parametern (z.B. id=1,range_end=500)
+
+Die Funktion gibt ein data.frame zurück; wo die JSON-Struktur verschachtelt ist, enthalten die Tabellenspalten noch Listen statt einzelner Werte, die man mit unnest() oder ähnlichen miesen Tricks (siehe Quellcode) auspacken muss. 
+
 ## Todo
 
-- Examples and use cases
-- Convert to a proper R library (anybody any advice how to do this?)
--- roxygen Commands and tags
--- Tests
-- /posts/search call (invitation only!)
-- /leaderboard call
-- /lists call
-- /lists/:listid/accounts call
-- /ctpost/:id call (hidden, possibly deprecated)
-- clean up the rather messy parameter structure for the calls
-- Error handling
+- Zu viel... :)
+
