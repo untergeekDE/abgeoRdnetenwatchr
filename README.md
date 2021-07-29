@@ -1,30 +1,9 @@
 # abgeoRdnetenwatchr
 Wrapper für die [API von abgeordnetenwatch.de](https://abgeordnetenwatch.de/api)
 
-Ziel: Schränkt die Möglichkeiten der API so weit ein, dass man sie gebrauchen kann: 
-- Objekt abfragen, z.B.: Wahl, Parlament
--- Problem: Anzahl der Rückgabewerte verändert sich mit der Entität
--- Problem: Filter sinnvoll anwenden: welche Filter sind wo zulässig?
--- 
-- Relationen abfragen
--- Was macht man dann mit denen?
+# API ansteuern
 
-Beispielaufgaben: 
-- Gib mir alle amtierenden Abgeordneten im Parlament x
-- Such mir alle Kandidaten für einen Wahlkreis
-- Such mir alle Ausschussmitglieder, die für Gesetz X mit ja gestimmt haben
-- Gib mir das Abstimmungsverhalten der Abgeordneten der Partei X als Tabelle
-
-
-Idee: Neben einer generischen Abfrage-Matrix ein paar starre Funktionen, 
-die in der Regel Vektoren zurückgeben (Beispiel: Abgeordnete - nur IDs), allenfalls als zweispaltige data.frames (ID, value - Beispiel: Gesetz, Stimmverhalten)
-
-
-
-## Installation
-
-## Function calls
-
+Wenn sie mit der richtigen URL aufgerufen wird, liefert die API ein JSON zurück, das die gewünschten Daten enthält. Zum Teil sind diese Daten etwas verschachtelt und müssen in R wieder auseinandergefaltet werden. 
 
 ## Entitäten
 
@@ -54,6 +33,44 @@ Diese 18 Typen von Entitäten gibt es:
 - **topics** (Themen)
 - **cities** (nur im Zusammenhang mit Nebentätigkeiten: Ort der Nebentätigkeit)
 - **countries** (nur im Zusammenhang mit Nebentätigkeiten: Land der Nebentätigkeit)
+
+Jeder Typ Entität hat seine eigenen Datenpunkte (also: Spalten in der Rückgabetabelle) - in der Regel kann man nach diesen Werten filtern. 
+
+## Beispiel-Aufrufe
+
+### Wahlen (BTW2021 hat die ID 128)
+* [/parliament-periods?type=election&parliament=5](https://www.abgeordnetenwatch.de/api/v2/parliament-periods?type=election&parliament=5)
+
+### Kandidatenliste pro Wahlkreis:
+* (ist nicht; indirekt über Wahlperiode herausfinden und filtern)
+
+### Wahlkreisliste zur BTW: 
+* [/constituencies?parliament_period=128](https://www.abgeordnetenwatch.de/api/v2/constituencies?parliament_period=128)
+* [/constituencies?parliament_period=128&number=178](https://www.abgeordnetenwatch.de/api/v2/constituencies?parliament_period=128&number=178) (Rheingau-Taunus)
+* [/parliament-periods/128?related_data=constituencies](https://www.abgeordnetenwatch.de/api/v2/parliament-periods/128?related_data=constituencies) (in der related data)
+
+### Kandidatenwahl zur BTW: 
+* [/candidacies-mandates?parliament_period=128](https://www.abgeordnetenwatch.de/api/v2/candidacies-mandates?parliament_period=128)
+
+### Kandidat:innen einer Partei
+indirekt, über referenziertes Objekt politician und Daten da
+* /candidacies-mandates?parliament_period=128&politician[entity.party.entity.id]=16(https://www.abgeordnetenwatch.de/api/v2)
+
+### Kandidat:innen eines Wahlkreises
+* [/candidacies-mandates?electoral_data[entity.constituency]=10235](https://www.abgeordnetenwatch.de/api/v2/candidacies-mandates?electoral_data[entity.constituency]=10235)
+* [/candidacies-mandates?constituency=10235](https://www.abgeordnetenwatch.de/api/v2/candidacies-mandates?constituency=10235) (Kurzform)
+* [/candidacies-mandates?constituency_nr=178&parliament_period=128](https://www.abgeordnetenwatch.de/api/v2/candidacies-mandates?constituency_nr=178&parliament_period=128) (Kurzform und BTW21)
+
+### Landesliste zur BTW: 
+* [/electoral-lists?parliament_period=128](https://www.abgeordnetenwatch.de/api/v2/electoral-lists?parliament_period=128)
+* [/electoral-lists?parliament_period=128&name[cn]=Hessen](https://www.abgeordnetenwatch.de/api/v2/electoral-lists?parliament_period=128&name[cn]=Hessen)
+...aber was macht man damit? Related data gibt's nicht...
+...Kandidaten filtern: 
+* [/candidacies-mandates?electoral_data[entity.electoral_list]=362](https://www.abgeordnetenwatch.de/api/v2/candidacies-mandates?electoral_data[entity.electoral_list]=362)
+
+### Mitglieder der SPD in der Datenbank
+(Filter über das related_data-Element party)
+* [/politicians?party[entity.id]=1](https://www.abgeordnetenwatch.de/api/v2/politicians?party[entity.id]=1)
 
 ## Todo
 
