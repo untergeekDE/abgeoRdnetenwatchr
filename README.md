@@ -1,52 +1,66 @@
-# RCrowdTangle
-A Wrapper To Retrieve Data From The CrowdTangle API
+# abgeoRdnetenwatchr
+Wrapper für die [API von abgeordnetenwatch.de](https://abgeordnetenwatch.de/api)
 
-This package provides programmatic accces to the [CrowdTangle API](https://help.crowdtangle.com/en/articles/1189612-crowdtangle-api) with R. Users need to have a [CrowdTangle](https://www.crowdtangle.com/) account in order to make API calls. 
+Ziel: Schränkt die Möglichkeiten der API so weit ein, dass man sie gebrauchen kann: 
+- Objekt abfragen, z.B.: Wahl, Parlament
+-- Problem: Anzahl der Rückgabewerte verändert sich mit der Entität
+-- Problem: Filter sinnvoll anwenden: welche Filter sind wo zulässig?
+-- 
+- Relationen abfragen
+-- Was macht man dann mit denen?
 
-The package currently supports using the *links* and *posts* endpoints of the CrowdTangle API, as well as the *post/:id* query (Facebook only!) to retrieve data on specific URLs and posts as well as searching for posts. 
+Beispielaufgaben: 
+- Gib mir alle amtierenden Abgeordneten im Parlament x
+- Such mir alle Kandidaten für einen Wahlkreis
+- Such mir alle Ausschussmitglieder, die für Gesetz X mit ja gestimmt haben
+- Gib mir das Abstimmungsverhalten der Abgeordneten der Partei X als Tabelle
 
-## Installing
 
-Download the RCrowdTangle.R file from the R folder, place it in your 
-working directory, and include it with ```source("RCrowdTangle.R")```
+Idee: Neben einer generischen Abfrage-Matrix ein paar starre Funktionen, 
+die in der Regel Vektoren zurückgeben (Beispiel: Abgeordnete - nur IDs), allenfalls als zweispaltige data.frames (ID, value - Beispiel: Gesetz, Stimmverhalten)
 
-As it's not a proper R library *yet*, installing it with
 
-```devtools::install_github("untergeekDE/RCrowdTangle")```
 
-will lead to errors. Yet.
+## Installation
 
 ## Function calls
 
-- **ct_auth(token, overwrite=FALSE)** - Set Crowdtangle token as an environment variable
-- **ct_get_links()** Call Links endpoint (consult [CT API documentation](https://github.com/CrowdTangle/API/wiki/Links) )
-- **ct_get_posts()** Call Posts endpoint (consult [CT API documentation](https://github.com/CrowdTangle/API/wiki/posts) )
-- **ct_search_posts** - Basically ct_get_posts() with a focus on search terms.
-- **ct_get_post_by_id(id)** - Call Post by ID endpoint (consult [CT API doc](https://github.com/CrowdTangle/API/wiki/Posts#get-postid)) 
-- **ct_get_fb_post(url)** - Return information on single FB post
 
-## Examples
+## Entitäten
 
-(TODO) 
+Die Abgeordnetenwatch-Datenbank ist in Objekten organisiert, die "Entitäten" heißen. 
 
-## Rate limit
+Jedes Objekt hat eine eindeutige ID in der Datenbank - und kann Beziehungen zu anderen Entitäten haben (z.B. ist eine Wahlperiode mit einem Parlament und den dort vertretenen Abgeordneten verknüpft; eine Abstimmung mit den beteiligten Abgeordneten und ihrem Abstimmungsverhalten). 
 
-The default rate limit for CrowdTangle API calls is 6 per minute (with the exception
-of the /links call which is limited to 2 calls per minute). The function calls
-wait for a fraction of a second before returning. 
+Die Objekte sind immer fest einer Wahl bzw. einer Wahlperiode zugeordnet: Beispielsweise ist die ID eines Wahlkreises in der Bundestagswahl 2017 eine andere als die ID desselben Wahlkreises in der BTW2021. (Beispiel Rheingau-Taunus: ID zur BTW2017 - 9188, ID in der Legislaturperiode 2017-2021 - 4302, ID zur BTW2021 - 10235.)
 
-If you wish to change the rate limit to something lower, use
+Diese 18 Typen von Entitäten gibt es: 
 
-- **ct_set_api_limit(n)** 
-- **ct_set_api_limit(n, links=TRUE)**
-
-to set the limit to n calls per minute. Whenever a query is done, a timer is set
-via the 
+- **parliaments** (die 16 Landesparlamente, der Bundestag und das EU-Parlament)
+- **parliament-periods"** (die Wahlperioden bzw. Wahlen - die werden gewissermaßen als gesonderte Wahlperiode gehandhabt)
+- **politician/s** (Politiker:innen - Einzelpersonen: Mandatsträger und Kandidaten)
+- **candidacies-mandate/s**
+- **committee/s** (Ausschüsse)
+- **committee-membership/s** (Mitgliedschaften in Ausschüssen)
+- **poll/s** (Abstimmungen im Parlament)
+- **vote/s** (Stimmen)
+- **party/ies** (Parteien)
+- **fractions** (Fraktionen im Parlament)
+- **electoral-list/s** (Wahllisten)
+- **constituency/cies** (Wahlkreise)
+- **election-program/s** (Wahlprogramme)
+- **sidejobs** (Nebentätigkeiten)
+- **sidejob-organisation/s** (Organisationen, in denen Nebentätigkeiten verzeichnet sind)
+- **topics** (Themen)
+- **cities** (nur im Zusammenhang mit Nebentätigkeiten: Ort der Nebentätigkeit)
+- **countries** (nur im Zusammenhang mit Nebentätigkeiten: Land der Nebentätigkeit)
 
 ## Todo
 
 - Examples and use cases
 - Convert to a proper R library (anybody any advice how to do this?)
+-- roxygen Commands and tags
+-- Tests
 - /posts/search call (invitation only!)
 - /leaderboard call
 - /lists call
