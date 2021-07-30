@@ -8,7 +8,7 @@ Description: abgeordnetenwatch.de is a public service by an NGO that stores data
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R(>=3.5.2)
+Depends: R (>= 3.5.2)
 Imports:
     jsonlite,
     dplyr,
@@ -16,4 +16,4 @@ Imports:
     lubridate
 Suggests:
     testthat
-    
+RoxygenNote: 7.1.1
