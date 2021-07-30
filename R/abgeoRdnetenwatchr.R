@@ -154,6 +154,9 @@ aw_get_table <- function(entity,...) {
   }
 }
 
+# ---- Macros ----
+  
+
 
 # ---- Sample query strings ----
 # You may try these by adding these strings to 
