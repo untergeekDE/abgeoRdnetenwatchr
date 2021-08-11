@@ -43,19 +43,20 @@ Die API gibt standardmäßig 100 Ergebnisse zurück, wenn man mehr braucht, muss
 ### Wahlen zum BTW (parliament=5)
 
 * API-Call: [/parliament-periods?type=election&parliament=5](https://www.abgeordnetenwatch.de/api/v2/parliament-periods?type=election&parliament=5)
-* Funktionsaufruf: ```aw_wahl("Bund")```
+* Funktionsaufruf: ```aw_get_table("elections",parliament=5)```
 
 Gibt eine Liste zurück mit Wahlen und Wahlperioden. Die #btw2021 hat die ID 128.
 
-### Kandidatenliste pro Wahlkreis:
-* (ist nicht; indirekt über Wahlperiode herausfinden und filtern)
+* Siehe auch: ```aw_wahl("Bund",2021)``` gibt 128 zurück. 
 
 ### Wahlkreisliste zur BTW: 
 * [/constituencies?parliament_period=128](https://www.abgeordnetenwatch.de/api/v2/constituencies?parliament_period=128)
 * [/constituencies?parliament_period=128&number=178](https://www.abgeordnetenwatch.de/api/v2/constituencies?parliament_period=128&number=178) (einen Wahlkreis ausfiltern: Rheingau-Taunus)
 * [/parliament-periods/128?related_data=constituencies](https://www.abgeordnetenwatch.de/api/v2/parliament-periods/128?related_data=constituencies) (in der related data steckt die Liste der Wahlkreise)
+* Funktionsaufruf: ```aw_get_table("constituencies",parliament_period=128)```
+* Funktionsaufruf: ```aw_wahlkreise(aw_wahl("Bund",2021))```
 
-### Kandidatenwahl zur BTW: 
+### Kandidaten zur BTW: 
 * [/candidacies-mandates?parliament_period=128](https://www.abgeordnetenwatch.de/api/v2/candidacies-mandates?parliament_period=128)
 
 ### Kandidat:innen einer Partei
