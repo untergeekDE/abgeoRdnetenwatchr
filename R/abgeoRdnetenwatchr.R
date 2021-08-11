@@ -76,7 +76,7 @@ modifiers <- factor(c("[eq]",  # "equal", ist der Standard-Operator "="
 #' `aw_get_id` fragt Daten für ein Objekt nach seiner ID ab
 #' 
 #' @details
-#' Abfrage eines einzelnen Objekts aus der aw-Datenbank. Gibt ein Listen-Objekt zurück, das dann mit der üblichen R-Notation mit $ ausgelesen werden kann. Der Typ der Entität muss bekannt sein und angegeben werden; IDs sind nicht eindeutig: 9188 bezeichnet ein Entität vom Typ candidacy-mandate und vom Typ constituency.   
+#' Abfrage eines einzelnen Objekts aus der aw-Datenbank. Gibt ein dataframe zurück. Der Typ der Entität muss bekannt sein und angegeben werden; IDs sind nicht eindeutig: 9188 bezeichnet ein Entität vom Typ candidacy-mandate und vom Typ constituency.   
 #' 
 #' @examples 
 #' aw_get_id("politicians",1)
@@ -84,7 +84,7 @@ modifiers <- factor(c("[eq]",  # "equal", ist der Standard-Operator "="
 #' @param entity Entity class, as listed in the factor entities
 #' @param id 
 #' @param ... List of filters 
-#' 
+#' @returns Dataframe mit allen Datenspalten
 #' @export
 aw_get_id <- function(entity,id,...) {
   # check parameters
@@ -100,9 +100,9 @@ aw_get_id <- function(entity,id,...) {
   for(i in filters) {
     cat(i)
   } 
-  aw_json <<- try(fromJSON(URLencode(query_string)), silent = TRUE)
+  aw_json <- try(fromJSON(URLencode(query_string)), silent = TRUE)
   if (aw_json$meta$status == "ok") {
-    return(aw_json$data)
+    return(jsonlite::flatten(aw_json$data))
   } else {
     return(FALSE)
   }
@@ -131,7 +131,7 @@ aw_get_id <- function(entity,id,...) {
 aw_get_table <- function(entity,...) {
   # check parameters: Entity parameter ok?
   if (!entity %in% entities) {
-    stop("Undefined entity")
+    stop(paste0("Entitäten-Typ ",entity," unbekannt"))
   }
   # List of arguments to be used as filters
   filters <- list(...)
@@ -160,7 +160,7 @@ aw_get_table <- function(entity,...) {
   # Ergebnis-dataframe über bind_rows() hinzu
   
   # Try to read JSON
-  aw_json <<- try(fromJSON(URLencode(query_string)), silent = TRUE)
+  aw_json <- try(fromJSON(URLencode(query_string)), silent = TRUE)
   # If successful, turn into dataframe and return. 
   if (aw_json$meta$status == "ok") {
     t <- jsonlite::flatten(aw_json$data)
@@ -171,14 +171,56 @@ aw_get_table <- function(entity,...) {
   # Mehr Treffer als Rückgabewerte?
   if (!is.null(aw_json$meta$result$count)) {
     if (aw_json$meta$result$count < aw_json$meta$result$total) {
+      cat(".",sep="")
       for (i in seq(from=100,to=aw_json$meta$result$total,by=100)) {
-        t <- bind_rows(t,aw_get_table(entity,...,range_start=i))
-        
+        qs <- paste0(query_string,"&range_start=",i)
+        aw_json <- try(fromJSON(URLencode(qs)), silent = TRUE)
+        # If successful, turn into dataframe and return. 
+        if (aw_json$meta$status == "ok") {
+          tt <- jsonlite::flatten(aw_json$data)
+        } else {
+          # Fehler beim Lesen
+          return(FALSE)
+        }
+        t <- bind_rows(t,tt)
+        cat(".",sep="")
       }
+      cat("\n")
     }
   }
   return(t)
 }
+
+#' aw_exists
+#' @description Hilfsfunktion prüft, ob Entität mit dieser ID existiert
+#' @param entity Ein Entitäts-Typ als String (vgl.: entities)
+#' @param id Die aw-ID der gesuchten Entität
+#' @returns TRUE, wenn die Entität mit dieser ID existiert, sonst FALSE
+#' @export
+aw_exists <- function(entity=NULL,id=0) {
+  # check parameters: Entity parameter ok?
+  if (!entity %in% entities) {
+    stop(paste0("Entitäten-Typ ",entity," unbekannt"))
+  }
+  query_string <- paste0("https://www.abgeordnetenwatch.de/",
+                         "api/v2",
+                         "/",entity,
+                         "/",id)
+  aw_json <- try(fromJSON(URLencode(query_string)), silent = TRUE)
+  # If successful, turn into dataframe and return. 
+  if (class(aw_json)=="try-error") {
+    return(FALSE)
+  } else {
+    if (aw_json$meta$status == "ok") {
+      return(TRUE)
+    } else {
+      # Fehler beim Lesen
+      return(FALSE)
+    }
+    
+  }
+}
+
 
 # ---- Makros für typische Aufgaben ----
 
@@ -325,6 +367,77 @@ aw_wahlkreise <- function(electionID=NULL) {
     select(id,wk=number,wk_name=name)
   return(r)
 }
+
+#' aw_kandidaten
+#' 
+#' @description
+#' `aw_kandidaten` gibt eine Personenliste für eine Wahl- oder Wahlkreis-ID zurück. 
+#' 
+#' @details
+#' Diese Funktion prüft, ob sie mit einer gültigen Wahlnummer aufgerufen wurde; wenn ja, gibt sie alle Kandidat:innen für diese Wahl zurück. Sonst nimmt sie an, dass sie mit einem Wahlkreis aufgerufen wurde - Wahlkreis-IDs sind ja immer fest einer Wahl zugeordnet - und ruft alle Kandidaten ab. 
+#' Wenn sie mit einer Wahlkreis-Liste aufgerufen wird, zieht sie sich die IDs aus der Liste. 
+#' 
+#' @examples 
+#' aw_kandidaten(aw_wahlkreise(128)) alle BTW-Kandidat:innen 2021
+#' aw_kandidaten(aw_wahl("Bund",2017)) alle 
+#' aw_kandidaten(10225) alle Bewerber:innen aus dem BTW-Wahlkreis Kassel 2021
+#' 
+#' @param electionID - aw-ID der Wahl bzw. Wahlperiode
+#' 
+#' @returns df mit ID, Namen, Partei-ID, Partei, Wahlkreis, Wahllisten-ID, Listen-Position, Wahlkreis-ID, Wahlkreis-Name
+#' 
+#' @export
+aw_kandidaten <- function(id=NULL) {
+  if (is.null(id)) {
+    warning("Keine Wahl/periode angegeben")
+    return(FALSE)
+  }
+  if (aw_exists("parliament-periods",id))
+  {
+    # Wahlkreisnummer
+    r <- aw_get_table("candidacies-mandates",parliament_period=id) %>% 
+      select(id=politician.id,
+             name=politician.label,
+             partei_id=party.id,
+             partei=party.label,
+             ergebnis_id= electoral_data.id,
+             ergebnis=electoral_data.constituency_result,
+             liste_id=electoral_data.electoral_list.id,
+             listenplatz=electoral_data.list_position,
+             wahlkreis_id=electoral_data.constituency.id,
+             wahlkreis=electoral_data.constituency.label
+             )
+    return(r)
+  } else {
+    # Wahlkreisnummer
+    r <- aw_get_table("candidacies-mandates",`electoral_data[entity.constituency]`=id) %>% 
+      select(id=politician.id,
+             name=politician.label,
+             partei_id=party.id,
+             partei=party.label,
+             ergebnis_id= electoral_data.id,
+             ergebnis=electoral_data.constituency_result,
+             liste_id=electoral_data.electoral_list.id,
+             listenplatz=electoral_data.list_position,
+             wahlkreis_id=electoral_data.constituency.id,
+             wahlkreis=electoral_data.constituency.label
+      )
+    return(r)
+  }
+}
+
+#' aw_personen
+#' 
+#' @description
+#' `aw_personen` recherchiert eine/n Politiker
+#' 
+#' @details
+#' @examples 
+#' @param 
+#' 
+#' @returns df mit der constiuency-ID, der Wahlkreis
+#' 
+#' @export
 
 # ---- Sample query strings ----
 # You may try these by adding these strings to 

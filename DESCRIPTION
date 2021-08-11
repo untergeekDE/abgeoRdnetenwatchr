@@ -1,7 +1,7 @@
 Package: abgeoRdnetenwatchr
 Type: Package
 Title: Wrapper für abgeordnetenwatch.de API v2
-Version: 0.1
+Version: 0.1.1
 Authors@R: person("Jan","Eggers",email="jan@eggers-elektronik.de",role=c("aut","cre"))
 Description: abgeordnetenwatch.de is a public service by an NGO that stores data on German political candidates and members of parliament on the regional, national, and European level, as well as parliamentary decisions, committee memberships, and side jobs. This wrapper is intended to make usage of the data and the API easier in R, offering a couple of macros for frequent tasks. 
 License: GPL-3

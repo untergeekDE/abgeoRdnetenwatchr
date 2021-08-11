@@ -79,15 +79,25 @@ indirekt, über referenziertes Objekt politician und Daten da
 (Filter über das related_data-Element party)
 * [/politicians?party[entity.id]=1](https://www.abgeordnetenwatch.de/api/v2/politicians?party[entity.id]=1)
 
-## Hilfsfunktion
+## Funktionen
 
-Um die Abrufe etwas zu formalisieren, habe ich mir die Funktion ```aw_get_table(entity,...)``` gebastelt. 
-- entity ist eine der oben erwähnten Entitäten - wonach fragen wir die Datenbank ab?
-- ... ist eine Liste von Filtern und Parametern (z.B. id=1,range_end=500)
+### Direktabruf
 
-Die Funktion gibt ein data.frame zurück; wo die JSON-Struktur verschachtelt ist, enthalten die Tabellenspalten noch Listen statt einzelner Werte, die man mit unnest() oder ähnlichen miesen Tricks (siehe Quellcode) auspacken muss. 
+* aw_get_id(entity,id) - ruft genau ein Objekt aus der Datenbank ab und gibt es als Liste zurück
+* aw_get_table(entity,...) - ruft Trefferlisten aus der Datenbank ab (und zwar alle, auch wenn es mehr als 100 Treffer sind)
+* aw_exists(entity,id) - prüft, ob es eine Entität diesen Typs mit dieser ID gibt
+
+### Makros
+
+Funktionen, die häufige Abrufen formalisieren und erleichtern sollen
+
+* aw_wahl() - sucht die ID einer Wahl
+* aw_wahlperiode() - sucht die ID einer Wahl oder Wahlperiode
+* aw_wahlkreise() - 
+* aw_kandidaten() - listet die Kandidat:innen zu einer Wahl oder einem Wahlkreis auf
 
 ## Todo
 
-- Zu viel... :)
+- aw_kandidaten() ausbauen: weniger Rückgabewerte, df als Parameter ermöglichen
+- aw_personen() - generische Funktion zur Personenrecherche
 

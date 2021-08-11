@@ -13,11 +13,14 @@ aw_get_id(entity, id, ...)
 
 \item{...}{List of filters}
 }
+\value{
+Dataframe mit allen Datenspalten
+}
 \description{
 `aw_get_id` fragt Daten für ein Objekt nach seiner ID ab
 }
 \details{
-Abfrage eines einzelnen Objekts aus der aw-Datenbank. Gibt ein Listen-Objekt zurück, das dann mit der üblichen R-Notation mit $ ausgelesen werden kann. Der Typ der Entität muss bekannt sein und angegeben werden; IDs sind nicht eindeutig: 9188 bezeichnet ein Entität vom Typ candidacy-mandate und vom Typ constituency.
+Abfrage eines einzelnen Objekts aus der aw-Datenbank. Gibt ein dataframe zurück. Der Typ der Entität muss bekannt sein und angegeben werden; IDs sind nicht eindeutig: 9188 bezeichnet ein Entität vom Typ candidacy-mandate und vom Typ constituency.
 }
 \examples{
 aw_get_id("politicians",1)

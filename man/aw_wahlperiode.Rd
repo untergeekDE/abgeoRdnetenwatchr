@@ -28,7 +28,7 @@ Wahlen sind in der aw-Datenbank gewissermaßen besondere Wahlperioden von i.d.R.
 \examples{
 aw_wahlperiode("Bundestag",2021) liefert 111 (die Bundestags-Wahlperiode 2017-2021)
 aw_wahlperiode("Bundestag",2020) liefert 111 (die Bundestags-Wahlperiode 2017-2021)
-aw_wahlperiode("Bundestag",2020,wahl=TRUE) liefert 111 (weil die Wahlperiode näher am Zeitpunkt liegt)
+aw_wahlperiode("Bundestag",2018,wahl=TRUE) liefert 111 (weil die Wahlperiode näher am Zeitpunkt liegt)
 aw_wahlperiode("Bundestag",2017,wahl=TRUE) liefert 50 (die Bundestagswahl 2017) - entspricht aw_wahl()
 aw_wahl("BL06",2018,wahl=FALSE) liefert (Hessischer Landtag, Wahlperiode 2018-2022)
 
