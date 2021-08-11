@@ -2,3 +2,6 @@
 
 export(aw_get_id)
 export(aw_get_table)
+export(aw_wahl)
+export(aw_wahlkreise)
+export(aw_wahlperiode)

@@ -13,4 +13,9 @@ entities
 \description{
 Entities
 }
+\details{
+Die Abgeordnetenwatch-Datenbank ist in Objekten organisiert, die "Entitäten" heißen. 
+Jedes Objekt hat eine eindeutige ID in der Datenbank - und kann Beziehungen zu anderen Entitäten haben (z.B. ist eine Wahlperiode mit einem Parlament und den dort vertretenen Abgeordneten verknüpft; eine Abstimmung mit den beteiligten Abgeordneten und ihrem Abstimmungsverhalten). 
+Die Objekte sind immer fest einer Wahl bzw. einer Wahlperiode zugeordnet: Beispielsweise ist die ID eines Wahlkreises in der Bundestagswahl 2017 eine andere als die ID desselben Wahlkreises in der BTW2021. (Beispiel Rheingau-Taunus: ID zur BTW2017 - 9188, ID in der Legislaturperiode 2017-2021 - 4302, ID zur BTW2021 - 10235.)
+}
 \keyword{datasets}

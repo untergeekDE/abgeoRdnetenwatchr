@@ -40,16 +40,20 @@ Jeder Typ Entität hat seine eigenen Datenpunkte (also: Spalten in der Rückgabe
 
 Die API gibt standardmäßig 100 Ergebnisse zurück, wenn man mehr braucht, muss man mit ```range_end``` (max. 1000) mehr Ergebnisse anfordern oder mit ```range_start``` bzw. ```page``` paginieren.
 
-### Wahlen (BTW2021 hat die ID 128)
-* [/parliament-periods?type=election&parliament=5](https://www.abgeordnetenwatch.de/api/v2/parliament-periods?type=election&parliament=5)
+### Wahlen zum BTW (parliament=5)
+
+* API-Call: [/parliament-periods?type=election&parliament=5](https://www.abgeordnetenwatch.de/api/v2/parliament-periods?type=election&parliament=5)
+* Funktionsaufruf: ```aw_wahl("Bund")```
+
+Gibt eine Liste zurück mit Wahlen und Wahlperioden. Die #btw2021 hat die ID 128.
 
 ### Kandidatenliste pro Wahlkreis:
 * (ist nicht; indirekt über Wahlperiode herausfinden und filtern)
 
 ### Wahlkreisliste zur BTW: 
 * [/constituencies?parliament_period=128](https://www.abgeordnetenwatch.de/api/v2/constituencies?parliament_period=128)
-* [/constituencies?parliament_period=128&number=178](https://www.abgeordnetenwatch.de/api/v2/constituencies?parliament_period=128&number=178) (Rheingau-Taunus)
-* [/parliament-periods/128?related_data=constituencies](https://www.abgeordnetenwatch.de/api/v2/parliament-periods/128?related_data=constituencies) (in der related data)
+* [/constituencies?parliament_period=128&number=178](https://www.abgeordnetenwatch.de/api/v2/constituencies?parliament_period=128&number=178) (einen Wahlkreis ausfiltern: Rheingau-Taunus)
+* [/parliament-periods/128?related_data=constituencies](https://www.abgeordnetenwatch.de/api/v2/parliament-periods/128?related_data=constituencies) (in der related data steckt die Liste der Wahlkreise)
 
 ### Kandidatenwahl zur BTW: 
 * [/candidacies-mandates?parliament_period=128](https://www.abgeordnetenwatch.de/api/v2/candidacies-mandates?parliament_period=128)

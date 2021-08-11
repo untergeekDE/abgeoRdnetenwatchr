@@ -2,23 +2,27 @@
 % Please edit documentation in R/abgeoRdnetenwatchr.R
 \name{aw_get_table}
 \alias{aw_get_table}
-\title{Request table of objects}
+\title{aw_get_table}
 \usage{
 aw_get_table(entity, ...)
 }
 \arguments{
-\item{entity}{Entity class, as listed in the factor entities}
+\item{entity}{Typ der abgefragten Datenobjekte (Entitäten)}
 
 \item{...}{List of filters}
 }
+\value{
+df mit den Daten (abhängig von der abgefragten Entität)
+}
 \description{
-`aw_get_table` requests data as a data frame.
+`aw_get_table` - Datenabfrage in ein Dataframe
 }
 \details{
-This function is used to request one single object, belonging to an entity class,
-defined by its ID.
+Abruf der Daten und Formatierung als Dataframe. Angegeben werden muss immer der Typ der abgefragten Daten - welche Art Entitäten wollen wir aus der Datenbank lesen? - optional sind Filter. Die Filter können dabei entweder in Form eines R-Parameters übergeben werden oder als String. Fragt die API in Blöcken zu 100 Ergebnissen ab.
 }
 \examples{
 aw_get_table("parliaments")
+aw_get_table("constituencies",parliament_period=128)
+aw_get_table("parliaments","label[cn]=hessen")
 
 }
