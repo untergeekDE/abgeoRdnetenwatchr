@@ -3,9 +3,15 @@ Wrapper für die [API von abgeordnetenwatch.de](https://abgeordnetenwatch.de/api
 
 # API ansteuern
 
-Wenn sie mit der richtigen URL aufgerufen wird, liefert die API ein JSON zurück, das die gewünschten Daten enthält. Zum Teil sind diese Daten etwas verschachtelt und müssen in R wieder auseinandergefaltet werden. 
+Basis-URL für einen API-Aufruf ist: 
 
-## Entitäten
+```https://www.abgeordnetenwatch.de/api/v2/(Entität)```
+
+Wenn sie mit den richtigen Parametern aufgerufen wird, liefert die API ein JSON zurück, das die gewünschten Daten enthält. Zum Teil sind diese Daten etwas verschachtelt; hier werden sie über jsonlite::flatten() in Dataframes gebügelt, die dann aber unterschiedliche und unterschiedlich viele Spalten haben. 
+
+
+
+### Entitäten
 
 Die Abgeordnetenwatch-Datenbank ist in Objekten organisiert, die "Entitäten" heißen. 
 
@@ -16,29 +22,58 @@ Die Objekte sind immer fest einer Wahl bzw. einer Wahlperiode zugeordnet: Beispi
 Diese 18 Typen von Entitäten gibt es: 
 
 - **parliaments** (die 16 Landesparlamente, der Bundestag und das EU-Parlament)
-- **parliament-periods"** (die Wahlperioden bzw. Wahlen - die werden gewissermaßen als gesonderte Wahlperiode gehandhabt)
-- **politician/s** (Politiker:innen - Einzelpersonen: Mandatsträger und Kandidaten)
-- **candidacies-mandate/s**
-- **committee/s** (Ausschüsse)
-- **committee-membership/s** (Mitgliedschaften in Ausschüssen)
-- **poll/s** (Abstimmungen im Parlament)
-- **vote/s** (Stimmen)
-- **party/ies** (Parteien)
+- **parliament-periods** (die Wahlperioden bzw. Wahlen - die werden gewissermaßen als gesonderte Wahlperiode gehandhabt)
+- **politicians** (Politiker:innen - Einzelpersonen: Mandatsträger und Kandidaten)
+- **candidacies-mandates**
+- **committees** (Ausschüsse)
+- **committee-memberships** (Mitgliedschaften in Ausschüssen)
+- **polls** (Abstimmungen im Parlament)
+- **votes** (Stimmen)
+- **parties** (Parteien)
 - **fractions** (Fraktionen im Parlament)
-- **electoral-list/s** (Wahllisten)
-- **constituency/cies** (Wahlkreise)
-- **election-program/s** (Wahlprogramme)
+- **electoral-lists** (Wahllisten)
+- **constituencies** (Wahlkreise)
+- **election-programs** (Wahlprogramme)
 - **sidejobs** (Nebentätigkeiten)
-- **sidejob-organisation/s** (Organisationen, in denen Nebentätigkeiten verzeichnet sind)
+- **sidejob-organisations** (Organisationen, in denen Nebentätigkeiten verzeichnet sind)
 - **topics** (Themen)
 - **cities** (nur im Zusammenhang mit Nebentätigkeiten: Ort der Nebentätigkeit)
 - **countries** (nur im Zusammenhang mit Nebentätigkeiten: Land der Nebentätigkeit)
 
 Jeder Typ Entität hat seine eigenen Datenpunkte (also: Spalten in der Rückgabetabelle) - in der Regel kann man nach diesen Werten filtern. 
 
+### Paginierung
+
+Die API gibt standardmäßig 100 Ergebnisse zurück, wenn man mehr braucht, muss man mit ```range_end``` (max. 1000) mehr Ergebnisse anfordern oder mit ```range_start``` bzw. ```page``` paginieren. 
+
+Die Funktion ````aw_get_table()``` hat eine Paginierung schon eingebaut: wenn mehr als 100 Treffer zurückgegeben werden, holt sie in 100er-Blöcken all diese Treffer ab. (Vorsicht: damit kann man die API ziemlich beschäftigen.)
+
+## Funktionen
+
+### Direktabruf
+
+* aw_get_id(entity,id) - ruft genau ein Objekt aus der Datenbank ab und gibt es als Liste zurück
+* aw_get_table(entity,...) - ruft Trefferlisten aus der Datenbank ab (und zwar alle, auch wenn es mehr als 100 Treffer sind)
+* aw_exists(entity,id) - prüft, ob es eine Entität diesen Typs mit dieser ID gibt
+
+### Makros
+
+Funktionen, die häufige Abrufen formalisieren und erleichtern sollen
+
+* aw_wahl() - sucht die ID einer Wahl
+* aw_wahlperiode() - sucht die ID einer Wahl oder Wahlperiode
+* aw_wahlkreise() - 
+* aw_kandidaten() - listet die Kandidat:innen zu einer Wahl oder einem Wahlkreis auf
+
+## Todo
+
+- aw_kandidaten() ausbauen: weniger Rückgabewerte, df als Parameter ermöglichen
+- aw_personen() - generische Funktion zur Personenrecherche
+- aw_personen() auch aktuelles Mandat, Liste von Entscheidungen, Antworten, Nebentätigkeiten ausspucken lassen
+- Liste Beispielaufrufe um Funktionen ergänzen
+
 ## Beispiel-Aufrufe
 
-Die API gibt standardmäßig 100 Ergebnisse zurück, wenn man mehr braucht, muss man mit ```range_end``` (max. 1000) mehr Ergebnisse anfordern oder mit ```range_start``` bzw. ```page``` paginieren.
 
 ### Wahlen zum BTW (parliament=5)
 
@@ -78,26 +113,3 @@ indirekt, über referenziertes Objekt politician und Daten da
 ### Mitglieder der SPD in der Datenbank
 (Filter über das related_data-Element party)
 * [/politicians?party[entity.id]=1](https://www.abgeordnetenwatch.de/api/v2/politicians?party[entity.id]=1)
-
-## Funktionen
-
-### Direktabruf
-
-* aw_get_id(entity,id) - ruft genau ein Objekt aus der Datenbank ab und gibt es als Liste zurück
-* aw_get_table(entity,...) - ruft Trefferlisten aus der Datenbank ab (und zwar alle, auch wenn es mehr als 100 Treffer sind)
-* aw_exists(entity,id) - prüft, ob es eine Entität diesen Typs mit dieser ID gibt
-
-### Makros
-
-Funktionen, die häufige Abrufen formalisieren und erleichtern sollen
-
-* aw_wahl() - sucht die ID einer Wahl
-* aw_wahlperiode() - sucht die ID einer Wahl oder Wahlperiode
-* aw_wahlkreise() - 
-* aw_kandidaten() - listet die Kandidat:innen zu einer Wahl oder einem Wahlkreis auf
-
-## Todo
-
-- aw_kandidaten() ausbauen: weniger Rückgabewerte, df als Parameter ermöglichen
-- aw_personen() - generische Funktion zur Personenrecherche
-

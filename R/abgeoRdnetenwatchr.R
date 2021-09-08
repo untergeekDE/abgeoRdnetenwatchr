@@ -171,7 +171,7 @@ aw_get_table <- function(entity,...) {
   # Mehr Treffer als Rückgabewerte?
   if (!is.null(aw_json$meta$result$count)) {
     if (aw_json$meta$result$count < aw_json$meta$result$total) {
-      cat(".",sep="")
+      cat("Lade ",aw_json$meta$result$total," Treffer: .",sep="")
       for (i in seq(from=100,to=aw_json$meta$result$total,by=100)) {
         qs <- paste0(query_string,"&range_start=",i)
         aw_json <- try(fromJSON(URLencode(qs)), silent = TRUE)
@@ -496,3 +496,4 @@ aw_kandidaten <- function(id=NULL) {
 #
 # Ist noch nicht zu Ende gedacht, weil aw_wahlkreis() ja verschiedenste
 # Entitäten zurückgeben kann - und das Ganze auch mit Vektoren/Listen funktionieren sollte
+
