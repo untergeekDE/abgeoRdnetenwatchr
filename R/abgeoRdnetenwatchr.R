@@ -396,7 +396,7 @@ aw_kandidaten <- function(id=NULL) {
   {
     # Wahlkreisnummer
     r <- aw_get_table("candidacies-mandates",parliament_period=id) %>% 
-      select(id=politician.id,
+      rename(id=politician.id,
              name=politician.label,
              partei_id=party.id,
              partei=party.label,
@@ -410,8 +410,8 @@ aw_kandidaten <- function(id=NULL) {
     return(r)
   } else {
     # Wahlkreisnummer
-    r <- aw_get_table("candidacies-mandates",`electoral_data[entity.constituency]`=id) %>% 
-      select(id=politician.id,
+    r <- aw_get_table("candidacies-mandates",`electoral_data[entity.constituency]`=id) #%>% 
+      rename(id=politician.id,
              name=politician.label,
              partei_id=party.id,
              partei=party.label,
