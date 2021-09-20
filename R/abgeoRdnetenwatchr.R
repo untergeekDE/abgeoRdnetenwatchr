@@ -148,11 +148,19 @@ aw_get_table <- function(entity,...) {
   
   # Try to read JSON
   aw_json <- try(fromJSON(URLencode(query_string)), silent = TRUE)
-  # If successful, turn into dataframe and return. 
+  # Catch error
+  if (class(aw_json)=="try-error") return(FALSE)
+  # If successful, turn into dataframe and return.
   if (aw_json$meta$status == "ok") {
-    t <- jsonlite::flatten(aw_json$data)
+    if(aw_json$meta$result$count > 0) {
+      t <- jsonlite::flatten(aw_json$data)
+    } else {
+      warning(paste0(query_string," returns empty list"))
+      return(FALSE)
+    }
   } else {
     # Fehler beim Lesen
+    warning(paste0(query_string," returns status != OK"))
     return(FALSE)
   }
   # Mehr Treffer als Rückgabewerte?
