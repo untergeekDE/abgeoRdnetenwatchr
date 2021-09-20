@@ -64,6 +64,7 @@ Funktionen, die häufige Abrufen formalisieren und erleichtern sollen
 * aw_wahlperiode() - sucht die ID einer Wahl oder Wahlperiode
 * aw_wahlkreise() - 
 * aw_kandidaten() - listet die Kandidat:innen zu einer Wahl oder einem Wahlkreis auf
+* aw_match_person()
 
 ## Todo
 
